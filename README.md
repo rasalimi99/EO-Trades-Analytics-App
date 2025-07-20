@@ -1,6 +1,8 @@
 # EO-Trades-Analytics-App
 
-A fully functional **Trading Journal Web Application** built for personal use with **vanilla JavaScript**, **IndexedDB**, and **Bootstrap**. This app empowers traders to organize, log, and analyze their trades across multiple accounts with powerful analytics and risk management — all offline and browser-based.
+A fully functional **Trading Journal Web Application** built for personal use with **vanilla JavaScript**, **IndexedDB**, and **Bootstrap**.  
+This app empowers traders to organize, log, and analyze their trades across multiple accounts with powerful analytics and risk management — all offline and browser-based.  
+It also supports **importing trades from MT5, cTrader, and CSV files** for faster journaling.
 
 ---
 
@@ -15,6 +17,9 @@ A fully functional **Trading Journal Web Application** built for personal use wi
 - **Trade Entry & Journaling:**  
   Detailed trade logging with entry/exit prices, position types, PnL calculation, tax classifications, and customizable templates for extra trade data.
 
+- **Trade Import:**  
+  Import trades from **MT5**, **cTrader**, or **CSV files** for quick journaling.
+
 - **Trade Reflection & Notes:**  
   Add post-trade reflections, outcomes, and attach screenshots for comprehensive journaling.
 
@@ -25,7 +30,7 @@ A fully functional **Trading Journal Web Application** built for personal use wi
   View daily, weekly, and monthly summaries, win rates, equity curves, best/worst trades, and strategy performance.
 
 - **Interactive Calendar:**  
-  Visualize trade activity and PnL via color-coded calendar with drill-down trade details.
+  Visualize trade activity and PnL via a color-coded calendar with drill-down trade details.
 
 - **Tax Tracking & Multi-Currency Support:**  
   Track tax reserves, calculate taxable income, and convert currencies with up-to-date exchange rates.
@@ -61,15 +66,19 @@ A fully functional **Trading Journal Web Application** built for personal use wi
 
 ## Installation & Usage
 
-1. Clone the repository:  
+1. **Clone the repository:**  
    ```bash
    git clone https://github.com/yourusername/eo-trades-analytics-app.git
-Open index.html in your preferred browser (no server required).
 
-## Usage
+## Open the App
 
-- Open `index.html` in your preferred browser (no server required).
-- Start logging your trades and managing your accounts!
+- **Open `index.html`** in your preferred browser (no server required).
+
+---
+
+## Start Journaling
+
+- Begin logging your trades and managing your accounts instantly!
 
 ---
 
@@ -80,6 +89,8 @@ Open index.html in your preferred browser (no server required).
 - **css/** — Custom stylesheets and Bootstrap overrides  
 - **assets/** — Images and icons  
 
+> **Note:** For privacy reasons, `main.js` (core logic) is not included in this repository but can be shared upon request.
+
 ---
 
 ## Future Improvements
@@ -87,20 +98,17 @@ Open index.html in your preferred browser (no server required).
 - Cloud synchronization and backup support  
 - Integration with modern frontend frameworks (React, Vue, or Svelte)  
 - Advanced tax calculation reports and filing support  
-- Import/export capabilities (CSV, Excel, JSON)  
 - Enhanced UI/UX with interactive charts and visualizations  
 
 ---
 
 ## Contributing
 
-This project started as a personal tool but contributions are welcome.
+This project started as a personal tool.
 
 ---
 
 ## Contact
 
-For questions or collaboration, please contact:  
+For questions , please contact:  
 **Email:** rasalimi22@gmail.com
-
-
