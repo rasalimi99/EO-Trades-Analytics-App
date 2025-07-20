@@ -1,0 +1,215 @@
+/* reports.css */
+
+/* Tabs */
+.rpt-nav-tabs {
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.rpt-nav-tabs .nav-link {
+    font-weight: 500;
+    color: #495057;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.rpt-nav-tabs .nav-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+}
+
+.rpt-nav-tabs .nav-link.active {
+    background-color: #007bff;
+    color: white;
+    border-radius: 0.25rem 0.25rem 0 0;
+}
+
+/* Filter Row */
+.rpt-filter-row {
+    margin-bottom: 1.5rem;
+}
+
+.rpt-filter-row .form-label {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.rpt-filter-row .form-select,
+.rpt-filter-row .form-control {
+    border-radius: 0.375rem;
+    font-size: 0.9rem;
+}
+
+/* Filter Controls */
+.rpt-filter-controls {
+    padding: 0.5rem 0;
+}
+
+.rpt-filter-controls .form-check-label {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.rpt-filter-controls .btn {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.75rem;
+}
+
+/* Tab Content */
+.rpt-tab-content {
+    background-color: #ffffff;
+    padding: 1rem;
+    border-radius: 0.375rem;
+}
+
+/* Report Row */
+.rpt-report-row {
+    margin-bottom: 1rem;
+}
+
+.rpt-report-row h5 {
+    font-size: 1.1rem;
+    color: #343a40;
+    margin-bottom: 0.75rem;
+}
+
+/* Tables */
+.rpt-table {
+    font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.rpt-table th,
+.rpt-table td {
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+.rpt-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+}
+
+.rpt-table td {
+    color: #212529;
+}
+
+.rpt-table tbody tr:hover {
+    background-color: #f1f3f5;
+}
+
+/* Charts */
+.rpt-chart-canvas {
+    width: 100% !important;
+    max-height: 300px;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Journal Collapse */
+.rpt-journal-collapse {
+    margin-top: 0.5rem;
+}
+
+.rpt-journal-collapse .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.rpt-journal-collapse img {
+    max-width: 50px;
+    max-height: 50px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 0.25rem;
+}
+
+/* Recent Reports */
+.rpt-recent-reports h5 {
+    font-size: 1.1rem;
+    color: #343a40;
+    margin-bottom: 0.75rem;
+}
+
+.rpt-list-group .list-group-item {
+    font-size: 0.9rem;
+    color: #495057;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-bottom: 1px solid #dee2e6;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.rpt-list-group .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* Configuration Modal */
+.rpt-config-form .form-label {
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.rpt-config-form .form-check {
+    margin-bottom: 0.5rem;
+}
+
+.rpt-config-form .form-check-label {
+    font-size: 0.9rem;
+    color: #212529;
+}
+
+.rpt-config-form .form-control {
+    font-size: 0.9rem;
+    border-radius: 0.375rem;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 576px) {
+    .rpt-filter-row > div {
+        margin-bottom: 1rem;
+    }
+
+    .rpt-nav-tabs {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .rpt-nav-tabs .nav-link {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .rpt-report-row > div {
+        margin-bottom: 1.5rem;
+    }
+
+    .rpt-table th,
+    .rpt-table td {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+
+    .rpt-chart-canvas {
+        max-height: 250px;
+    }
+}
+
+/* Hover Effects for Buttons */
+.rpt-filter-controls .btn:hover,
+.rpt-journal-collapse .btn:hover {
+    background-color: #e9ecef;
+}
+
+/* Accessibility */
+.rpt-nav-tabs .nav-link:focus,
+.rpt-filter-controls .btn:focus,
+.rpt-list-group .list-group-item:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}

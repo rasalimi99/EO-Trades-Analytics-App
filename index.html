@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link href='https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css' rel='stylesheet'>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="login">
+    <div class="login__content">
+      <div class="login__img">
+        <img src="assets/img/logo.png" alt="" >
+      </div>
+
+      <div class="login__forms">
+        <!-- Login Form -->
+        <form class="login__registre" id="login-form">
+          <h1 class="login__title">Sign In</h1>
+          <div class="login__box">
+            <i class='bx bx-user login__icon'></i>
+            <input type="email" placeholder="Email" id="username" class="login__input" required>
+          </div>
+          <div class="login__box">
+            <i class='bx bx-lock-alt login__icon'></i>
+            <input type="password" placeholder="Password" id="password" class="login__input" required>
+          </div>
+          <div class="login__box">
+            <input type="checkbox" id="stay-logged-in">
+            <label for="stay-logged-in" style="font-size: 14px;">Stay logged in</label>
+          </div>
+          <div id="login-msg" class="alert alert-danger d-none"></div>
+          <button type="submit" class="login__button">Sign In</button>
+          <div>
+            <span class="login__account">Don't have an account?</span>
+            <span class="login__signin" id="sign-up">Sign Up</span>
+          </div>
+        </form>
+
+        <!-- Register Form -->
+        <form class="login__create none" id="register-form">
+          <h1 class="login__title">Create Account</h1>
+          <div class="login__box">
+            <i class='bx bx-at login__icon'></i>
+            <input type="email" placeholder="Email" id="email" class="login__input" required>
+          </div>
+          <div class="login__box">
+            <i class='bx bx-lock-alt login__icon'></i>
+            <input type="password" placeholder="Password" id="regPassword" class="login__input" required>
+          </div>
+          <div class="login__box">
+            <i class='bx bx-user login__icon'></i>
+            <input type="text" placeholder="Full Name" id="fullName" class="login__input" required>
+          </div>
+          <div class="login__box">
+            <i class='bx bxl-discord login__icon'></i>
+            <input type="text" placeholder="Discord Name" id="discord" class="login__input" required>
+          </div>
+          <div id="reg-msg" class="alert d-none"></div>
+          <button type="submit" class="login__button">Sign Up</button>
+          <div>
+            <span class="login__account">Already have an Account?</span>
+            <span class="login__signup" id="sign-in">Sign In</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabase = createClient(
+      'https://bjdscdfrtempliqdlaau.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqZHNjZGZydGVtcGxpcWRsYWF1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyODkzODksImV4cCI6MjA2Mjg2NTM4OX0.bV7cH17hfK4MqY6N_QOcpao8DAVfqi37n5BSZTtXxDU'
+    );
+
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginMsg = document.getElementById('login-msg');
+    const regMsg = document.getElementById('reg-msg');
+
+    const showError = (el, message) => {
+      el.textContent = message;
+      el.classList.remove('d-none');
+    };
+
+    const getDeviceId = () => btoa(navigator.userAgent + navigator.platform + screen.width + screen.height);
+
+    loginForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginMsg.classList.add('d-none');
+
+      const email = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const stayLoggedIn = document.getElementById('stay-logged-in').checked;
+      const deviceId = getDeviceId();
+
+      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({ email, password });
+      if (loginError || !loginData.session) return showError(loginMsg, loginError?.message || 'Login failed');
+
+      const { data: approved, error: rpcError } = await supabase.rpc('check_approval');
+      if (rpcError || !approved) {
+        await supabase.auth.signOut();
+        return showError(loginMsg, 'Your account is not approved yet.');
+      }
+
+      let { data: serial } = await supabase.from('serials').select('*').eq('user_id', loginData.user.id).maybeSingle();
+      if (!serial) {
+        let { data: available } = await supabase.from('serials').select('*').is('user_id', null).limit(1).maybeSingle();
+        if (!available) {
+          const key = 'SN-' + Array.from({ length: 12 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'[Math.floor(Math.random() * 36)]).join('');
+          const { data: newSerial } = await supabase.from('serials').insert({ serial_key: key }).select().single();
+          available = newSerial;
+        }
+        await supabase.from('serials').update({ user_id: loginData.user.id, device_fingerprint: deviceId }).eq('id', available.id);
+        serial = available;
+      }
+
+      if (serial.device_fingerprint && serial.device_fingerprint !== deviceId) {
+        await supabase.auth.signOut();
+        return showError(loginMsg, 'Access denied: This serial is already linked to another device.');
+      }
+
+      if (!serial.device_fingerprint) {
+        await supabase.from('serials').update({ device_fingerprint: deviceId }).eq('id', serial.id);
+      }
+
+      const token = loginData.session.access_token;
+      const storage = stayLoggedIn ? localStorage : sessionStorage;
+      storage.setItem('sessionToken', token);
+      storage.setItem('username', email);
+
+      window.location.href = 'idx.html';
+    });
+
+    registerForm?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      regMsg.classList.add('d-none');
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const fullName = document.getElementById('fullName').value.trim();
+      const discord = document.getElementById('discord').value.trim();
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error || !data?.user?.id) return showError(regMsg, error?.message || 'Registration failed.');
+
+      const { error: profileErr } = await supabase.from('profiles').insert({
+        id: data.user.id,
+        email,
+        full_name: fullName,
+        discord,
+        approved: false
+      });
+
+      if (profileErr) {
+        console.error('Profile insert failed:', profileErr);
+        return showError(regMsg, profileErr.message);
+      }
+
+      regMsg.className = 'alert alert-success mt-3';
+      regMsg.textContent = 'Registered successfully. Waiting for admin approval... Redirecting to login.';
+      regMsg.classList.remove('d-none');
+      setTimeout(() => window.location.href = 'index.html', 1000);
+    });
+
+    // Toggle Forms
+    document.getElementById('sign-up')?.addEventListener('click', () => {
+      document.getElementById('login-form').classList.add('none');
+      document.getElementById('register-form').classList.remove('none');
+    });
+
+    document.getElementById('sign-in')?.addEventListener('click', () => {
+      document.getElementById('register-form').classList.add('none');
+      document.getElementById('login-form').classList.remove('none');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,2051 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+    <title>EO Trades Analytics App</title>
+    <link rel="icon" type="image/x-icon" href="logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="calender.css">
+    <link rel="stylesheet" href="report.css">
+    <link href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" rel="stylesheet" />
+    <!-- index.html -->
+<!-- Ensure Font Awesome is included -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Existing head content -->
+   
+  <!-- NEW: Add flatpickr CSS and JS for date range picker -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+<!-- Other meta/link tags -->
+
+  <script type="module">
+    import { isAuthenticated } from './auth.js';
+    console.log('dashboard.html loaded, checking authentication');
+    if (!isAuthenticated()) {
+      console.log('Not authenticated in dashboard.html, redirecting to login.html');
+      window.location.replace('ua.html');
+    }
+  </script>
+</head>
+<body class="light-mode" id="main-body">
+    <nav class="navbar navbar-expand-lg modern-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand modern-navbar-brand" href="#">EO Trades Analytics App </a>
+            <button class="navbar-toggler modern-navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav modern-navbar-nav">
+                    <li class="nav-item"><a class="nav-link modern-nav-link active" href="#" data-page="dashboard"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="trade-log"><i class="bi bi-book me-1"></i> Trade Log</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="add-trade"><i class="bi bi-plus-circle me-1"></i> Add Trade</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="daily-plan"><i class="bi bi-calendar-day me-1"></i> Daily Plan</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="weekly-review"><i class="bi bi-calendar-week me-1"></i> Weekly Review</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="strategies"><i class="bi bi-gear me-1"></i> Strategies</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="trade-transfers"><i class="bi bi-arrow-left-right me-1"></i> Trade Transfers</a></li> <!-- Add this line -->                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="settings"><i class="bi bi-sliders me-1"></i> Settings</a></li>
+                    <li class="nav-item"><a class="nav-link modern-nav-link" href="#" data-page="reports"><i class="bi bi-file-earmark-text me-1"></i> Reports</a></li>
+                </ul>
+                <div class="ms-auto d-flex align-items-center">
+                    <div class="account-dropdown-wrapper me-2">
+                        <i class="bi bi-person-circle account-dropdown-icon"></i>
+                        <select class="form-select modern-form-select account-dropdown" id="active-account">
+                            <option value="">Select Account</option>
+                        </select>
+                    </div>
+
+                    
+                
+                    <!-- Date Range Filter Dropdown -->
+                    <div class="dropdown me-2 modern-dropdown">
+                        <button class="btn dropdown-toggle modern-dropdown-toggle" type="button" id="dateRangeFilter" data-bs-toggle="dropdown" aria-expanded="false">
+                            Date Range: Current Month
+                        </button>
+                        <ul class="dropdown-menu" id="date-range-dropdown">
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="current-month">Current Month</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="last-3-days">Last 3 Days</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="last-7-days">Last 7 Days</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="last-15-days">Last 15 Days</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="last-30-days">Last 30 Days</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="year-to-date">Year to Date</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="all-time">All Time</a></li>
+                            <li><a class="dropdown-item date-filter-option" href="#" data-filter="custom">Custom Range</a></li>
+                          </ul>
+                    </div>
+
+                    <!-- NEW: Hidden input for custom range picker -->
+                    <input type="text" id="customRangePicker" class="d-none" placeholder="Select custom range">
+                
+                
+                    <!-- Theme Toggle Button as a Blue Button -->
+                    <button class="btn btn-default" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-4">
+        <div id="dashboard" class="page active">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2>Dashboard</h2>
+                <div class="d-flex align-items-center" id="dashboard-controls">
+                    <button id="save-dashboard" class="btn btn-primary btn-sm ms-2 d-none" title="Save your dashboard changes">Save</button>
+                    <span id="edit-mode-message" class="ms-2 text-muted d-none" style="font-size: 14px;"></span>
+                    <div class="ms-2 template-dropdown-container">
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary btn-sm dropdown-toggle template-dropdown-btn" type="button" id="template-select" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-grid me-1"></i> Select Template
+                            </button>
+                            <ul class="dropdown-menu template-dropdown-menu" aria-labelledby="template-select" id="template-dropdown">
+                                <li class="dropdown-item template-option" data-template-name="">Select Template</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-outline-primary btn-sm ms-2" id="import-trades-btn" data-bs-toggle="modal" data-bs-target="#importTradesModal">
+                        <i class="bi bi-upload me-1"></i> Import Trades
+                    </button>
+                </div>
+            </div>
+            <div data-section="metrics" class="top-metrics-row mb-4"></div>
+            <div data-section="tables" class="mb-4"></div>
+            <div data-section="charts" class="charts-grid"></div>
+        </div>
+    </div>
+
+
+    <div class="container my-4">
+      
+      <!-- Trade Log Page -->
+    <section id="trade-log" class="page" style="display: none; opacity: 0;">
+        <div class="container-fluid">
+            <h2 class="mb-4">Trade Log</h2>
+            <div class="card filter-section mb-3 p-3">
+                <h5 class="mb-3">Filters</h5>
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3 col-sm-6">
+                        <label for="filter-input" class="form-label">Quick Search</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="filter-input" placeholder="Pair, strategy...">
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="filter-pair" class="form-label">Pair</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
+                            <select class="form-select" id="filter-pair">
+                                <option value="">All Pairs</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <label for="filter-outcome" class="form-label">Outcome</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-check-circle"></i></span>
+                            <select class="form-select" id="filter-outcome">
+                                <option value="">All Outcomes</option>
+                                <option value="Win">Win</option>
+                                <option value="Loss">Loss</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-sm-6 d-flex align-items-end gap-2">
+                        <button class="btn btn-clean-secondary btn-icon" id="clear-filters" title="Clear Filters">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </button>
+                        <button class="btn btn-clean-primary btn-icon" data-bs-toggle="modal" data-bs-target="#advancedFilterModal" title="More Filters">
+                            <i class="bi bi-filter"></i>
+                        </button>
+                        <div class="dropdown">
+                            <button class="btn btn-clean-primary btn-icon" type="button" id="column-filter-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Select Columns">
+                                <i class="bi bi-columns"></i>
+                            </button>
+                         
+                        </div>
+                        <button class="btn btn-clean-primary btn-icon" id="export-trades" title="Export Trades">
+                            <i class="bi bi-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-0">
+                <div class="table-responsive" style="max-height: 600px; overflow-y: auto;" id="trade-table-scroll-area">
+                    <table class="table table-striped trade-table mb-0">
+                        <thead id="trade-header"></thead>
+                        <tbody id="trade-body"></tbody>
+                    </table>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <div class="text-muted small" id="filter-summary"></div>
+                    <nav aria-label="Trade log pagination">
+                        <ul class="pagination mb-0" id="pagination"></ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+<!-- Replace existing #importTradesModal before <div id="toast-container"> -->
+<div class="modal fade" id="importTradesModal" tabindex="-1" aria-labelledby="importTradesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importTradesModalLabel">Import Trades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="import-trades-form">
+                    <div class="mb-3">
+                        <label for="file-type" class="form-label">File Type</label>
+                        <select class="form-select" id="file-type" required>
+                            <option value="">Select File Type</option>
+                            <option value="csv">CSV</option>
+                            <option value="mt5">MT5 HTML</option>
+                            <option value="ctrader">cTrader HTML</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="timezone-selection" style="display: none;">
+                        <label for="source-timezone-select" class="form-label">MT5 Report Timezone (Source)</label>
+                        <select class="form-select" id="source-timezone-select">
+                            <option value="">Select Source Timezone</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="target-timezone-selection" style="display: none;">
+                        <label for="target-timezone-select" class="form-label">Target Timezone for Imported Times</label>
+                        <select class="form-select" id="target-timezone-select">
+                            <option value="">Select Target Timezone</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="import-file" class="form-label">Select File</label>
+                        <input type="file" class="form-control" id="import-file" accept=".csv,.html,.htm" required disabled>
+                    </div>
+                    <div id="column-mapping-section" class="mb-3" style="display: none;">
+                        <div id="column-mappings"></div>
+                    </div>
+                    <div id="preview-section" class="mb-3" style="display: none;">
+                        <h6>Preview Imported Trades (All Records)</h6>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                            <table class="table table-striped table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Account ID</th>
+                                        <th>Date</th>
+                                        <th>Entry Time</th>
+                                        <th>Exit Time</th>
+                                        <th>Symbol</th>
+                                        <th>Position</th>
+                                        <th>Lot</th>
+                                        <th>Entry Price</th>
+                                        <th>Stop Loss</th>
+                                        <th>Take Profit</th>
+                                        <th>Exit Price</th>
+                                        <th>Commission</th>
+                                        <th>Swap</th>
+                                        <th>Profit/Loss</th>
+                                        <th>Initial Risk</th>
+                                        <th>Net Risk</th>
+                                        <th>Planned RR</th>
+                                        <th>Actual RR</th>
+                                        <th>Outcome</th>
+                                        <th>Timeframe ID</th>
+                                        <th>Position ID</th>
+                                        <th>Pips</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="import-feedback" class="mt-3"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submit-import">Parse File</button>
+                <button type="button" class="btn btn-success" id="confirm-import" style="display: none;">Confirm Import</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Manage Templates Modal -->
+<div class="modal fade" id="manageTemplatesModal" tabindex="-1" aria-labelledby="manageTemplatesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="manageTemplatesModalLabel">Manage Templates</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <button class="btn btn-primary btn-sm" id="add-new-template">Add New Template</button>
+                </div>
+                <div id="template-list">
+                    <!-- Template items with previews will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Advanced Filter Modal (Unchanged) -->
+    <div class="modal fade" id="advancedFilterModal" tabindex="-1" aria-labelledby="advancedFilterModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-clean">
+                    <h5 class="modal-title" id="advancedFilterModalLabel">More Filters</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="advanced-filter-form">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="filter-date-start" class="form-label">Date From</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input type="date" class="form-control" id="filter-date-start">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="filter-date-end" class="form-label">Date To</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                    <input type="date" class="form-control" id="filter-date-end">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="filter-strategy" class="form-label">Strategy</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-bar-chart"></i></span>
+                                    <select class="form-select" id="filter-strategy"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="sort-select" class="form-label">Sort By</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-sort-down"></i></span>
+                                    <select class="form-select" id="sort-select">
+                                        <option value="date">Date</option>
+                                        <option value="profitLoss">Profit/Loss</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="records-per-page" class="form-label">Records Per Page</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-list"></i></span>
+                                    <select class="form-select" id="records-per-page">
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="button" class="btn btn-clean-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <!-- Trade Details Modal -->
+<div class="modal fade" id="reflectionModal" tabindex="-1" aria-labelledby="reflectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reflectionModalLabel">
+  Trade <span id="trade-detail-number"></span>
+  <span id="direction-badge" class="badge ms-2"></span>
+</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="trade-details-form" class="p-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-trade-type" class="form-label">Trade Type</label>
+                            <select class="form-select" id="detail-trade-type" required>
+                                <option value="">Select Trade Type</option>
+                                <option value="Scalp Trade">H/F Scalp Trade</option>
+                                <option value="Scalp Trade">Scalp Trade</option>
+                                <option value="Day Trade">Day Trade</option>
+                                <option value="Position Trade">Position Trade</option>
+                                <option value="Swing Trade">Swing Trade</option>
+                            </select>
+                        </div>
+
+                         <div class="col-md-6 mb-3">
+                            <label for="detail-trade-type" class="form-label">Position</label>
+                            <select class="form-select" id="trade-position" required>
+                                 <option value="">Select Position</option>
+                                    <option value="buy">Buy (Long)</option>
+                                    <option value="sell">Sell (Short)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-timeframe" class="form-label">Timeframe</label>
+                           <select class="form-select" id="detail-timeframe" required>
+    <option value="">Select Timeframe</option>
+    <!-- Minute Timeframes -->
+    <option value="M1">1 Minute (M1)</option>
+    <option value="M2">2 Minutes (M2)</option>
+    <option value="M3">3 Minutes (M3)</option>
+    <option value="M5">5 Minutes (M5)</option>
+    <option value="M10">10 Minutes (M10)</option>
+    <option value="M15">15 Minutes (M15)</option>
+    <option value="M30">30 Minutes (M30)</option>
+
+    <!-- Hourly Timeframes -->
+    <option value="H1">1 Hour (H1)</option>
+    <option value="H2">2 Hours (H2)</option>
+    <option value="H3">3 Hours (H3)</option>
+    <option value="H4">4 Hours (H4)</option>
+    <option value="H6">6 Hours (H6)</option>
+    <option value="H8">8 Hours (H8)</option>
+    <option value="H12">12 Hours (H12)</option>
+
+    <!-- Daily and above -->
+    <option value="D1">1 Day (D1)</option>
+    <option value="W1">1 Week (W1)</option>
+    <option value="MN">1 Month (MN)</option>
+</select>
+
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-session" class="form-label">Session</label>
+                            <select class="form-select" id="detail-session" required>
+                                <option value="">Select Session</option>
+                                <option value="Asia">Asia</option>
+                                <option value="London">London</option>
+                                <option value="New York">New York</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-strategy" class="form-label">Strategy</label>
+                            <select class="form-select" id="detail-strategy" required>
+                                <option value="">Select Strategy</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-adherence-value" class="form-label">Adherence</label>
+                            <div class="star-rating" id="detail-adherence-rating">
+                                <input type="radio" name="detail-adherence" id="detail-adherence-5" value="5" required>
+                                <label for="detail-adherence-5" class="star">★</label>
+                                <input type="radio" name="detail-adherence" id="detail-adherence-4" value="4">
+                                <label for="detail-adherence-4" class="star">★</label>
+                                <input type="radio" name="detail-adherence" id="detail-adherence-3" value="3">
+                                <label for="detail-adherence-3" class="star">★</label>
+                                <input type="radio" name="detail-adherence" id="detail-adherence-2" value="2">
+                                <label for="detail-adherence-2" class="star">★</label>
+                                <input type="radio" name="detail-adherence" id="detail-adherence-1" value="1">
+                                <label for="detail-adherence-1" class="star">★</label>
+                                <input type="hidden" id="detail-adherence-value" name="detail-adherence-value">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-setup-score" class="form-label">Setup Score</label>
+                            <input type="range" class="form-range" id="detail-setup-score" min="1" max="10" value="8">
+                            <span id="detail-setup-score-value" class="slider-value">Score: 8</span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-planned-risk" class="form-label">Planned Risk ($)</label>
+                            <input type="number" class="form-control" id="detail-planned-risk" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-actual-risk" class="form-label">Actual Risk ($)</label>
+                            <input type="number" class="form-control" id="detail-actual-risk" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-planned-rr" class="form-label">Planned RR</label>
+                            <input type="number" class="form-control" id="detail-planned-rr" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-actual-rr" class="form-label">Actual RR</label>
+                            <input type="number" class="form-control" id="detail-actual-rr" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-lot-size" class="form-label">Lot Size</label>
+                            <input type="number" class="form-control" id="detail-lot-size" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-stop-loss" class="form-label">Stop Loss (pips)</label>
+                            <input type="number" class="form-control" id="detail-stop-loss" min="0" required>
+                        </div>
+                        <!-- New Fields: Entry Price, SL Price, Exit Price, Hold Time -->
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-entry-price" class="form-label">Entry Price</label>
+                            <input type="number" class="form-control" id="detail-entry-price" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-sl-price" class="form-label">SL Price</label>
+                            <input type="number" class="form-control" id="detail-sl-price" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-exit-price" class="form-label">Exit Price</label>
+                            <input type="number" class="form-control" id="detail-exit-price" step="0.01" min="0">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-hold-time" class="form-label">Hold Time (min)</label>
+                            <input type="text" class="form-control" id="detail-hold-time" placeholder="e.g., 2h 30m or 150m">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-exit-reason" class="form-label">Exit Reason</label>
+                            <select class="form-select" id="detail-exit-reason" required>
+                                <option value="">Select Exit Reason</option>
+                                <option value="Structure">Structure</option>
+                                <option value="Manual">Manual</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="detail-exit-reason-custom" class="form-label">Custom Exit Reason</label>
+                            <input type="text" class="form-control" id="detail-exit-reason-custom">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="detail-mood" class="form-label">Mood</label>
+                         <select class="form-select" id="detail-mood" required>
+    <option value="">Select Mood</option>
+
+                        <!-- Positive Moods -->
+                        <optgroup label="😊 Positive">
+                            <option value="Calm">😌 Calm</option>
+                            <option value="Confident">💪 Confident</option>
+                            <option value="Focused">🎯 Focused</option>
+                            <option value="Excited">🤩 Excited</option>
+                            <option value="Happy">😄 Happy</option>
+                            <option value="Overconfident">😎 Overconfident</option>
+                        </optgroup>
+
+                        <!-- Neutral Moods -->
+                        <optgroup label="😐 Neutral">
+                            <option value="Neutral">😐 Neutral</option>
+                            <option value="Tired">😴 Tired</option>
+                        </optgroup>
+
+                        <!-- Negative Moods -->
+                        <optgroup label="😟 Negative">
+                            <option value="Anxious">😰 Anxious</option>
+                            <option value="Fearful">😨 Fearful</option>
+                            <option value="Stressed">😫 Stressed</option>
+                            <option value="Angry">😡 Angry</option>
+                            <option value="Frustrated">😤 Frustrated</option>
+                            <option value="Greedy">🤑 Greedy</option>
+                            <option value="Revengeful">😠 Revengeful</option>
+                            <option value="Impatient">⏳ Impatient</option>
+                        </optgroup>
+                    </select>
+
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label for="detail-emotion-tags-value" class="form-label">Emotion Tags</label>
+                            <input type="text" class="form-control" id="detail-emotion-tags-value" style="display: none;" disabled required>
+                            <input type="text" class="form-control mt-2" id="detail-emotion-new-tag" placeholder="Add new emotion tag">
+                            <div id="emotion-tags-container" class="tag-container"></div>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label for="detail-mistakes-tags-value" class="form-label">Mistakes Tags</label>
+                            <input type="text" class="form-control" style="display: none;" disabled id="detail-mistakes-tags-value">
+                            <input type="text" class="form-control mt-2" id="detail-mistakes-new-tag" placeholder="Add new mistake tag">
+                            <div id="mistakes-tags-container" class="tag-container"></div>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="detail-trade-notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="detail-trade-notes" rows="4"></textarea>
+                        </div>
+                    </div>
+                    <div id="detail-image-uploads" class="mt-3"></div>
+                    <div class="mt-2">
+                        <button type="button" class="btn btn-clean-primary btn-sm" id="add-image-upload">Add Image</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-reflection">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Column Filter Modal -->
+        <div class="modal fade" id="columnFilterModal" tabindex="-1" aria-labelledby="columnFilterModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="columnFilterModalLabel">Select Visible Columns</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="column-filter-form">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-trade-num" checked>
+                                <label class="form-check-label" for="col-trade-num">Trade #</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-date" checked>
+                                <label class="form-check-label" for="col-date">Date</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-time" checked>
+                                <label class="form-check-label" for="col-time">Time</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-pair" checked>
+                                <label class="form-check-label" for="col-pair">Pair</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-type" checked>
+                                <label class="form-check-label" for="col-type">Type</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-timeframe" checked>
+                                <label class="form-check-label" for="col-timeframe">Timeframe</label>
+                            </div>
+                            <div class="form-check">
+    <input type="checkbox" class="form-check-input" id="col-direction" checked>
+    <label class="form-check-label" for="col-direction">Direction</label>
+</div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-strategy" checked>
+                                <label class="form-check-label" for="col-strategy">Strategy</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-risk-plan" checked>
+                                <label class="form-check-label" for="col-risk-plan">Risk Plan</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-risk" checked>
+                                <label class="form-check-label" for="col-risk">Risk</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-lot-size" checked>
+                                <label class="form-check-label" for="col-lot-size">Lot Size</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-outcome" checked>
+                                <label class="form-check-label" for="col-outcome">Outcome</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-profit-loss" checked>
+                                <label class="form-check-label" for="col-profit-loss">Profit/Loss</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-balance" checked>
+                                <label class="form-check-label" for="col-balance">Balance</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-tags" checked>
+                                <label class="form-check-label" for="col-tags">Tags</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-images" checked>
+                                <label class="form-check-label" for="col-images">Images</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="col-actions" checked>
+                                <label class="form-check-label" for="col-actions">Actions</label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-clean-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-clean-primary btn-sm" id="save-column-filter">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advanced Filter Modal -->
+        <div class="modal fade" id="advancedFilterModal" tabindex="-1" aria-labelledby="advancedFilterModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header modal-header-clean">
+                        <h5 class="modal-title" id="advancedFilterModalLabel">Advanced Filters</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="advanced-filter-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-pair" class="form-label">Pair</label>
+                                    <select class="form-select" id="filter-pair">
+                                        <option value="">All Pairs</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-outcome" class="form-label">Outcome</label>
+                                    <select class="form-select" id="filter-outcome">
+                                        <option value="">All Outcomes</option>
+                                        <option value="Win">Win</option>
+                                        <option value="Loss">Loss</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-strategy" class="form-label">Strategy</label>
+                                    <select class="form-select" id="filter-strategy"></select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-risk-plan" class="form-label">Risk Plan</label>
+                                    <select class="form-select" id="filter-risk-plan"></select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-date-start" class="form-label">Date From</label>
+                                    <input type="date" class="form-control" id="filter-date-start">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-date-end" class="form-label">Date To</label>
+                                    <input type="date" class="form-control" id="filter-date-end">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-balance-min" class="form-label">Min Balance</label>
+                                    <input type="number" class="form-control" id="filter-balance-min" placeholder="e.g., 48000">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="filter-balance-max" class="form-label">Max Balance</label>
+                                    <input type="number" class="form-control" id="filter-balance-max" placeholder="e.g., 54000">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tags</label>
+                                <div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input filter-tag" type="checkbox" id="tag-fearful" value="Fearful">
+                                        <label class="form-check-label" for="tag-fearful">Fearful</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input filter-tag" type="checkbox" id="tag-confident" value="Confident">
+                                        <label class="form-check-label" for="tag-confident">Confident</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input filter-tag" type="checkbox" id="tag-greedy" value="Greedy">
+                                        <label class="form-check-label" for="tag-greedy">Greedy</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input filter-tag" type="checkbox" id="tag-overtrading" value="Overtrading">
+                                        <label class="form-check-label" for="tag-overtrading">Overtrading</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input filter-tag" type="checkbox" id="tag-chasing" value="Chasing">
+                                        <label class="form-check-label" for="tag-chasing">Chasing</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-clean-primary">Apply Filters</button>
+                            <button type="button" class="btn btn-clean-secondary ms-2" data-bs-dismiss="modal">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Trade Page -->
+        <div id="add-trade" class="page">
+            <h2>Add Trade</h2>
+            <div class="card p-4 mb-4">
+                <div class="progress sticky-top mb-4" style="top: 1rem;">
+                    <div id="form-progress" class="progress-bar bg-primary" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <form id="trade-form" class="mb-3">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="account" class="form-label">Account</label>
+                            <select class="form-select" id="account" required>
+                                <option value="">Select Account</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <div class="input-wrapper">
+                                <input type="date" class="form-control" id="date" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="trade-time" class="form-label">Time</label>
+                            <div class="input-wrapper">
+                                <input type="time" class="form-control" id="trade-time" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="pair" class="form-label">Pair</label>
+                            <select class="form-select" id="pair" required>
+                                <option value="">Select Pair</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="adherence-value" class="form-label">Adherence</label>
+                            <div class="star-rating" id="adherence-rating">
+                                <input type="radio" name="adherence" id="adherence-5" value="5" required>
+                                <label for="adherence-5" class="star">&#9733;</label>
+                                <input type="radio" name="adherence" id="adherence-4" value="4">
+                                <label for="adherence-4" class="star">&#9733;</label>
+                                <input type="radio" name="adherence" id="adherence-3" value="3">
+                                <label for="adherence-3" class="star">&#9733;</label>
+                                <input type="radio" name="adherence" id="adherence-2" value="2">
+                                <label for="adherence-2" class="star">&#9733;</label>
+                                <input type="radio" name="adherence" id="adherence-1" value="1">
+                                <label for="adherence-1" class="star">&#9733;</label>
+                                <input type="hidden" id="adherence-value" name="adherence-value">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="strategy" class="form-label">Strategy</label>
+                            <select class="form-select" id="strategy" required>
+                                <option value="">Select Strategy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <span id="trade-submit-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                        Add Trade
+                    </button>
+                </form>
+            </div>
+        </div>
+
+
+        <!-- Daily Plan Page -->
+<!-- Daily Plan Page -->
+<div id="daily-plan" class="page">
+    <h2>Daily Game Plan</h2>
+    <div class="card p-3 mb-4">
+        <div class="card-body position-relative">
+            <h6 class="card-title">Daily Plan Calendar</h6>
+            <div id="daily-plan-calendar" style="min-height: 100px;"></div>
+        </div>
+    </div>
+</div>
+<div id="weekly-review" class="page">
+
+    
+    <!-- Content will be rendered dynamically by weeklyReview.js -->
+</div>
+
+        <div id="strategies" class="page stratpage-enhanced-page-styling">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="stratpage-enhanced-heading"><i class="bi bi-gear-fill me-2"></i>Strategies</h2>
+                <button class="btn stratpage-enhanced-btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#strategyFormCollapse" aria-expanded="true" aria-controls="strategyFormCollapse">
+                    <i class="bi bi-plus-circle me-1"></i>Add/Edit Strategy
+                </button>
+            </div>
+            
+            <div class="row">
+                <!-- Strategy Form Section -->
+                <div class="col-md-6">
+                    <div id="strategyFormCollapse" class="accordion-collapse collapse show mb-4">
+                        <div class="card stratpage-enhanced-card p-3">
+                            <form id="strategy-form">
+                                <!-- Basic Information Section -->
+                                <div class="stratpage-form-section mb-3">
+                                    <h6 class="stratpage-section-title">Basic Information</h6>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label for="account" class="form-label stratpage-enhanced-label"><i class="bi bi-person-circle me-1"></i>Account</label>
+                                            <select class="form-select stratpage-enhanced-form-select" id="account" required>
+                                                <option value="">Select Account</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="strategy-name" class="form-label stratpage-enhanced-label"><i class="bi bi-tag-fill me-1"></i>Strategy Name</label>
+                                            <input type="text" class="form-control stratpage-enhanced-form-control" id="strategy-name" placeholder="e.g., Morning Breakout" required>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label for="strategy-description" class="form-label stratpage-enhanced-label"><i class="bi bi-text-paragraph me-1"></i>Description</label>
+                                        <textarea class="form-control stratpage-enhanced-form-control stratpage-taller-textarea" id="strategy-description" rows="4" placeholder="e.g., Trade breakouts during London open with tight stops" required></textarea>
+                                    </div>
+                                </div>
+        
+                                <!-- Market and Timeframe Section -->
+                                <div class="stratpage-form-section mb-3">
+                                    <h6 class="stratpage-section-title">Market and Timeframes</h6>
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label for="strategy-market-type" class="form-label stratpage-enhanced-label"><i class="bi bi-globe me-1"></i>Market Type</label>
+                                            <select class="form-select stratpage-enhanced-form-select" id="strategy-market-type" required>
+                                                <option value="">Select Market Type</option>
+                                                <option value="forex">Forex</option>
+                                                <option value="indices">Indices</option>
+                                                <option value="commodities">Commodities</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="strategy-timeframes" class="form-label stratpage-enhanced-label"><i class="bi bi-clock me-1"></i>Timeframes</label>
+                                            <select class="form-select stratpage-enhanced-form-select stratpage-taller-select" id="strategy-timeframes" multiple required>
+                                                <!-- Minute Timeframes -->
+    <option value="M1">1 Minute (M1)</option>
+    <option value="M2">2 Minutes (M2)</option>
+    <option value="M3">3 Minutes (M3)</option>
+    <option value="M5">5 Minutes (M5)</option>
+    <option value="M10">10 Minutes (M10)</option>
+    <option value="M15">15 Minutes (M15)</option>
+    <option value="M30">30 Minutes (M30)</option>
+
+    <!-- Hourly Timeframes -->
+    <option value="H1">1 Hour (H1)</option>
+    <option value="H2">2 Hours (H2)</option>
+    <option value="H3">3 Hours (H3)</option>
+    <option value="H4">4 Hours (H4)</option>
+    <option value="H6">6 Hours (H6)</option>
+    <option value="H8">8 Hours (H8)</option>
+    <option value="H12">12 Hours (H12)</option>
+
+    <!-- Daily and above -->
+    <option value="D1">1 Day (D1)</option>
+    <option value="W1">1 Week (W1)</option>
+    <option value="MN">1 Month (MN)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <!-- Tags Section -->
+                                <div class="stratpage-form-section mb-3">
+                                    <h6 class="stratpage-section-title">Tags</h6>
+                                    <label for="strategy-tags" class="form-label stratpage-enhanced-label"><i class="bi bi-tags-fill me-1"></i>Tags</label>
+                                    <div id="strategy-tags" class="tag-container mb-2 stratpage-enhanced-tag-container"></div>
+                                    <input type="hidden" id="strategy-tags-value">
+                                    <input type="text" class="form-control stratpage-enhanced-form-control" id="strategy-new-tag" placeholder="Enter new tag and press Enter">
+                                </div>
+        
+                                <!-- Conditions Section -->
+                                <div class="stratpage-form-section mb-3">
+                                    <h6 class="stratpage-section-title d-flex justify-content-between align-items-center">
+                                        <span><i class="bi bi-box-arrow-in-right me-1"></i>Entry Conditions</span>
+                                        <button type="button" class="btn stratpage-enhanced-btn-info stratpage-manage-btn" id="manage-condition-types"><i class="bi bi-gear me-1"></i>Manage</button>
+                                    </h6>
+                                    <div id="entry-conditions" class="stratpage-condition-container">
+                                        <!-- Example condition row (dynamically added via JS) -->
+                                        <div class="condition-row d-flex gap-2 mb-2">
+                                            <select class="form-select stratpage-enhanced-form-select" style="width: 40%;">
+                                                <option value="">Select Type</option>
+                                                <option value="Price Action">Price Action</option>
+                                            </select>
+                                            <input type="text" class="form-control stratpage-enhanced-form-control" placeholder="Description" style="width: 40%;">
+                                            <input type="text" class="form-control stratpage-enhanced-form-control" placeholder="Params (optional)" style="width: 40%;">
+                                            <button type="button" class="btn stratpage-condition-remove-btn"><i class="bi bi-trash"></i></button>
+                                        </div>
+                                    </div>
+                                    <button type="button" class="btn stratpage-enhanced-btn-secondary mt-1" id="add-entry-condition"><i class="bi bi-plus-circle me-1"></i>Add</button>
+        
+                                    <div class="mt-3">
+                                        <label class="form-label stratpage-enhanced-label"><i class="bi bi-box-arrow-right me-1"></i>Exit Conditions</label>
+                                        <div id="exit-conditions" class="stratpage-condition-container">
+                                            <!-- Example condition row (dynamically added via JS) -->
+                                            <div class="condition-row d-flex gap-2 mb-2">
+                                                <select class="form-select stratpage-enhanced-form-select" style="width: 40%;">
+                                                    <option value="">Select Type</option>
+                                                    <option value="Indicator">Indicator</option>
+                                                </select>
+                                                <input type="text" class="form-control stratpage-enhanced-form-control" placeholder="Description" style="width: 40%;">
+                                                <input type="text" class="form-control stratpage-enhanced-form-control" placeholder="Params (optional)" style="width: 40%;">
+                                                <button type="button" class="btn stratpage-condition-remove-btn"><i class="bi bi-trash"></i></button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn stratpage-enhanced-btn-secondary mt-1" id="add-exit-condition"><i class="bi bi-plus-circle me-1"></i>Add</button>
+                                    </div>
+                                </div>
+        
+                                <!-- Risk Settings Section -->
+                                <div class="stratpage-form-section mb-3">
+                                    <h6 class="stratpage-section-title">Risk Settings</h6>
+                                    <label class="form-label stratpage-enhanced-label"><i class="bi bi-shield-check me-1"></i>Risk Settings</label>
+                                    <div class="row g-2">
+                                        <div class="col-md-4">
+                                            <label>Risk Percent</label>
+                                            <input type="number" class="form-control stratpage-enhanced-form-control" id="risk-percent" placeholder="Risk %" step="0.1" min="0" value="0.5">
+                                        </div>
+                                        <div class="col-md-4">
+                                              <label>Stop Loss Pip</label>
+                                            <input type="number" class="form-control stratpage-enhanced-form-control" id="stop-loss-pips" placeholder="SL Pips" min="0" value="10">
+                                        </div>
+                                        <div class="col-md-4">
+                                                <label>Risk Reward</label>
+                                            <input type="number" class="form-control stratpage-enhanced-form-control" id="risk-reward" placeholder="RR" step="0.1" min="0" value="2">
+                                        </div>
+                                    </div>
+                                </div>
+        
+                                <!-- Form Actions -->
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn stratpage-enhanced-btn-primary"><i class="bi bi-check-circle me-1"></i>Add</button>
+                                    <button type="button" class="btn stratpage-enhanced-btn-primary d-none" id="update-strategy"><i class="bi bi-pencil-square me-1"></i>Update</button>
+                                    <button type="button" class="btn stratpage-enhanced-btn-secondary d-none" id="cancel-strategy-update"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Strategy List Section -->
+                <div class="col-md-6">
+                    <div class="card stratpage-enhanced-card p-3">
+                        <h5 class="stratpage-enhanced-subheading"><i class="bi bi-list-ul me-2"></i>Strategy List</h5>
+                        <div class="stratlist-filter-container mb-2">
+                            <div class="row g-1">
+                                <div class="col-md-3">
+                                    <div class="input-group stratlist-input-group">
+                                        <span class="input-group-text stratlist-input-icon"><i class="bi bi-search"></i></span>
+                                        <input type="text" class="form-control stratlist-form-control" id="strategy-search" placeholder="Search...">
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group stratlist-input-group">
+                                        <span class="input-group-text stratlist-input-icon"><i class="bi bi-globe"></i></span>
+                                        <select class="form-select stratlist-form-select" id="strategy-market-type">
+                                            <option value="">All Markets</option>
+                                            <option value="forex">Forex</option>
+                                            <option value="indices">Indices</option>
+                                            <option value="commodities">Commodities</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group stratlist-input-group">
+                                        <span class="input-group-text stratlist-input-icon"><i class="bi bi-clock"></i></span>
+                                        <select class="form-select stratlist-form-select" id="strategy-timeframe">
+                                            <option value="">All Timeframes</option>
+                                            <option value="M5">M5</option>
+                                            <option value="M15">M15</option>
+                                            <option value="M30">M30</option>
+                                            <option value="H1">H1</option>
+                                            <option value="H4">H4</option>
+                                            <option value="D1">D1</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group stratlist-input-group">
+                                        <span class="input-group-text stratlist-input-icon"><i class="bi bi-tags"></i></span>
+                                        <select class="form-select stratlist-form-select" id="strategy-tag-filter">
+                                            <option value="">All Tags</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <div class="input-group stratlist-input-group">
+                                    <span class="input-group-text stratlist-input-icon"><i class="bi bi-sort-down"></i></span>
+                                    <select class="form-select stratlist-form-select" id="strategy-sort">
+                                        <option value="name">Sort by Name</option>
+                                        <option value="createdAt">Sort by Created Date</option>
+                                        <option value="lastUsed">Sort by Last Used</option>
+                                        <option value="tradeCount">Sort by Trade Count</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Add above <div id="strategy-list"> -->
+<div class="d-flex gap-2 mb-2">
+    <select class="form-select stratpage-enhanced-form-select" id="copy-target-account" style="width: 200px;">
+        <option value="">Select Target Account</option>
+    </select>
+    <button class="btn stratpage-enhanced-btn-primary" id="copy-strategies-btn" disabled><i class="bi bi-files me-1"></i>Copy to Account</button>
+</div>
+
+<!-- Add new modal after existing modals -->
+<div class="modal fade" id="copyStrategiesModal" tabindex="-1" aria-labelledby="copyStrategiesModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copyStrategiesModalLabel">Confirm Copy Strategies</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Copy the following strategies to <strong id="copy-target-account-name"></strong>?</p>
+                <ul id="copy-strategies-list"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="confirm-copy-strategies">Copy</button>
+            </div>
+        </div>
+    </div>
+</div>
+                        <div id="strategy-list" class="stratpage-enhanced-strategy-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Ensure modals are included before </body> -->
+        <div class="modal fade" id="deleteStrategyModal" tabindex="-1" aria-labelledby="deleteStrategyModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteStrategyModalLabel">Confirm Delete</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this strategy? This action can be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-danger btn-sm" id="confirm-delete-strategy">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="strategyDetailsModal" tabindex="-1" aria-labelledby="strategyDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="strategyDetailsModalLabel">Strategy Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Strategy details will be populated dynamically -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade stratmodal-container" id="manageConditionTypesModal" tabindex="-1" aria-labelledby="manageConditionTypesModalLabel" aria-hidden="true">
+            <div class="modal-dialog stratmodal-dialog">
+                <div class="modal-content stratmodal-content">
+                    <div class="modal-header stratmodal-header">
+                        <h5 class="modal-title stratmodal-title" id="manageConditionTypesModalLabel"><i class="bi bi-gear me-2"></i>Manage Condition Types</h5>
+                        <button type="button" class="btn-close stratmodal-close-btn" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body stratmodal-body">
+                        <form id="condition-types-form" class="mb-3">
+                            <div class="mb-3">
+                                <label for="condition-type-name" class="form-label stratmodal-label">Condition Type Name</label>
+                                <input type="text" class="form-control stratmodal-input" id="condition-type-name" placeholder="e.g., Breakout" required>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm stratmodal-btn-primary"><i class="bi bi-plus-circle me-1"></i>Add Type</button>
+                                <button type="button" class="btn btn-primary btn-sm stratmodal-btn-primary d-none" id="update-condition-type"><i class="bi bi-check-circle me-1"></i>Update Type</button>
+                                <button type="button" class="btn btn-secondary btn-sm stratmodal-btn-secondary d-none" id="cancel-condition-type-update"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                            </div>
+                        </form>
+                        <table class="table stratmodal-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="condition-types-list-body">
+                                <!-- Example row (dynamically populated) -->
+                                <tr>
+                                    <td>Price Action</td>
+                                    <td>
+                                        <button class="btn stratmodal-btn-action stratmodal-btn-edit stratmodal-icon-btn" data-name="Price Action" title="Edit"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn stratmodal-btn-action stratmodal-btn-delete stratmodal-icon-btn" data-name="Price Action" title="Delete"><i class="bi bi-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer stratmodal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm stratmodal-btn-secondary" data-bs-dismiss="modal"><i class="bi bi-x-circle me-1"></i>Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="trade-transfers" class="page tradetransfer-enhanced-page-styling">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h2 class="tradetransfer-enhanced-heading"><i class="bi bi-swap me-2"></i>Trade Transfers</h2>
+            </div>
+        
+            <!-- Top Section: Filters and Accounts -->
+            <div class="card tradetransfer-enhanced-card p-3 mb-4">
+              <div class="row g-2">
+                <!-- Date Range -->
+                <div class="col-md-4">
+                  <label for="date-range" class="form-label tradetransfer-enhanced-label"><i class="bi bi-calendar-date me-1"></i>Date Range</label>
+                  <input id="date-range" class="form-control tradetransfer-enhanced-form-control" placeholder="Select Date Range">
+                </div>
+                <!-- Source Account -->
+                <div class="col-md-4">
+                  <label for="source-account" class="form-label tradetransfer-enhanced-label"><i class="bi bi-person-circle me-1"></i>Source Account</label>
+                  <select id="source-account" class="form-select tradetransfer-enhanced-form-select" aria-label="Source Account">
+                    <option value="">Select Source Account</option>
+                  </select>
+                </div>
+                <!-- Target Account -->
+                <div class="col-md-4">
+                  <label for="target-account" class="form-label tradetransfer-enhanced-label"><i class="bi bi-person-circle me-1"></i>Target Account</label>
+                  <select id="target-account" class="form-select tradetransfer-enhanced-form-select" aria-label="Target Account">
+                    <option value="">Select Target Account</option>
+                  </select>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-3">
+                <button id="load-trades-btn" class="btn tradetransfer-enhanced-btn-white"><i class="bi bi-list-ul me-1"></i>Load Trades</button>
+              </div>
+            </div>
+        
+            <!-- Trade List Section -->
+            <div id="trade-list-container" class="tradetransfer-enhanced-trade-container d-none">
+              <h5 class="tradetransfer-enhanced-subheading"><i class="bi bi-list-ul me-2"></i>Select Trades</h5>
+              <div class="table-responsive">
+                <table id="trade-list" class="table table-bordered table-hover tradetransfer-enhanced-table">
+                  <thead>
+                    <tr>
+                      <th scope="col" style="width: 5%;">
+                        <input type="checkbox" id="select-all" class="form-check-input" title="Select All">
+                      </th>
+                      <th scope="col" style="width: 10%;"><i class="bi bi-hash"></i>ID</th>
+                      <th scope="col" style="width: 15%;"><i class="bi bi-calendar-date"></i>Date</th>
+                      <th scope="col" style="width: 15%;"><i class="bi bi-currency-exchange"></i>Pair</th>
+                      <th scope="col" style="width: 15%;"><i class="bi bi-gear"></i>Strategy</th>
+                      <th scope="col" style="width: 15%;"><i class="bi bi-check-circle"></i>Outcome</th>
+                      <th scope="col" style="width: 15%;"><i class="bi bi-wallet"></i>PnL</th>
+                      <th scope="col" style="width: 20%;"><i class="bi bi-sticky"></i>Notes</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="tradetransfer-enhanced-pagination">
+                <div>
+                  <button id="first-page" class="btn btn-outline-secondary">First</button>
+                  <button id="prev-page" class="btn btn-outline-secondary">Previous</button>
+                  <button id="next-page" class="btn btn-outline-secondary">Next</button>
+                  <button id="last-page" class="btn btn-outline-secondary">Last</button>
+                </div>
+                <div>
+                  <select id="page-size" class="form-select tradetransfer-enhanced-form-select">
+                    <option value="10">10 per page</option>
+                    <option value="25" selected>25 per page</option>
+                    <option value="50">50 per page</option>
+                    <option value="100">100 per page</option>
+                    <option value="all">Show All (up to 1000)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-3 gap-2">
+                <div class="d-flex gap-2">
+                  <select id="strategy-select" class="form-select tradetransfer-enhanced-form-select" style="width: 200px;">
+                    <option value="">Select Strategy</option>
+                  </select>
+                  <button id="assign-strategy-btn" class="btn tradetransfer-enhanced-btn-primary" disabled>
+                    <i class="bi bi-gear me-1"></i>Assign Strategy
+                  </button>
+                </div>
+                <button id="transfer-button" class="btn tradetransfer-enhanced-btn-primary" disabled>
+                  <i class="bi bi-arrow-right me-1"></i>Transfer Trades
+                </button>
+              </div>
+            </div>
+        
+            <!-- Confirmation Modal for Transfer -->
+            <div class="modal fade tradetransfer-enhanced-modal" id="confirm-modal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="confirmModalLabel">Confirm Trade Transfer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p id="transfer-summary"></p>
+                    <ul id="trade-details" class="list-group"></ul>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button id="confirm-transfer" class="btn btn-primary btn-sm tradetransfer-enhanced-btn-primary">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        
+            <!-- Confirmation Modal for Assign Strategy -->
+            <div class="modal fade tradetransfer-enhanced-modal" id="assign-strategy-modal" tabindex="-1" aria-labelledby="assignStrategyModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="assignStrategyModalLabel">Confirm Assign/Reassign Strategy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p id="assign-strategy-summary"></p>
+                    <ul id="assign-strategy-details" class="list-group"></ul>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button id="confirm-assign-strategy" class="btn btn-primary btn-sm tradetransfer-enhanced-btn-primary">Confirm</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <!-- Settings Page -->
+<div id="settings" class="page fade-in">
+    <div class="container-fluid py-4">
+        <h2 class="mb-4 text-primary"><i class="bi bi-gear-fill me-2"></i>Settings</h2>
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="accordion" id="settingsAccordion">
+
+                           <!-- Broker Multipliers -->
+                   <div class="accordion-item border-0 mb-2">
+    <h2 class="accordion-header" id="broker-heading">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#broker-management" aria-expanded="false" aria-controls="broker-management">
+            <i class="bi bi-bank me-2"></i>Broker Multipliers
+        </button>
+    </h2>
+    <div id="broker-management" class="accordion-collapse collapse" aria-labelledby="broker-heading" data-bs-parent="#settingsAccordion">
+        <div class="accordion-body">
+            <form id="broker-form" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="broker-name" class="form-label">Broker Name</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-bank"></i></span>
+                            <input type="text" class="form-control" id="broker-name" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-forex" class="form-label">Forex Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-exchange"></i></span>
+                            <input type="number" class="form-control" id="multiplier-forex" step="0.01" min="0" value="10" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-indices" class="form-label">Indices Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-graph-up"></i></span>
+                            <input type="number" class="form-control" id="multiplier-indices" step="0.01" min="0" value="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-commodities" class="form-label">Commodities Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-box"></i></span>
+                            <input type="number" class="form-control" id="multiplier-commodities" step="0.01" min="0" value="1" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-crypto" class="form-label">Crypto Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-currency-bitcoin"></i></span>
+                            <input type="number" class="form-control" id="multiplier-crypto" step="0.01" min="0" value="0.01" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-xagusd" class="form-label">XAGUSD Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-box"></i></span>
+                            <input type="number" class="form-control" id="multiplier-xagusd" step="0.01" min="0" value="5" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="multiplier-xauusd" class="form-label">XAUUSD Multiplier</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-box"></i></span>
+                            <input type="number" class="form-control" id="multiplier-xauusd" step="0.01" min="0" value="100" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>Add Broker</button>
+                    <button type="button" class="btn btn-secondary btn-sm ms-2 d-none" id="update-broker"><i class="bi bi-pencil me-1"></i>Update Broker</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm ms-2 d-none" id="cancel-broker-update"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                </div>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Name</th>
+                            <th>Forex</th>
+                            <th>Indices</th>
+                            <th>Commodities</th>
+                            <th>Crypto</th>
+                            <th>XAGUSD</th>
+                            <th>XAUUSD</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="broker-list-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+                     <!-- Account Management -->
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header" id="account-heading">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#account-management" aria-expanded="true" aria-controls="account-management">
+                                <i class="bi bi-person-circle me-2"></i>Account Management
+                            </button>
+                        </h2>
+                        <div id="account-management" class="accordion-collapse collapse show" aria-labelledby="account-heading" data-bs-parent="#settingsAccordion">
+                            <div class="accordion-body">
+                                <form id="account-form" class="mb-4">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="account-name" class="form-label">Account Name</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                                <input type="text" class="form-control" id="account-name" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="initial-balance" class="form-label">Initial Balance ($)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-currency-dollar"></i></span>
+                                                <input type="number" class="form-control" id="initial-balance" step="0.01" min="0" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="daily-drawdown" class="form-label">Daily Drawdown (%)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                                <input type="number" class="form-control" id="daily-drawdown" step="0.01" min="0" max="100" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="max-trades-per-day" class="form-label">Max Trades Per Day</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-list-task"></i></span>
+                                                <input type="number" class="form-control" id="max-trades-per-day" min="1" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="max-loss-per-day" class="form-label">Max Loss Per Day (%)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                                <input type="number" class="form-control" id="max-loss-per-day" step="0.01" min="0" max="100" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="broker-id" class="form-label">Broker</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-bank"></i></span>
+                                                <select class="form-select" id="broker-id">
+                                                    <option value="">Select Broker</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 d-flex align-items-end">
+                                            <div class="form-check">
+                                                <input type="checkbox" class="form-check-input" id="is-propfirm">
+                                                <label class="form-check-label" for="is-propfirm">Is Prop Firm</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 prop-firm-field d-none">
+                                            <label for="max-drawdown" class="form-label">Max Drawdown (%)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                                <input type="number" class="form-control" id="max-drawdown" step="0.01" min="0" max="100">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 prop-firm-field d-none">
+                                            <label for="profit-split" class="form-label">Profit Split (%)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-percent"></i></span>
+                                                <input type="number" class="form-control" id="profit-split" step="0.01" min="0" max="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>Add Account</button>
+                                        <button type="button" class="btn btn-secondary btn-sm ms-2 d-none" id="update-account"><i class="bi bi-pencil me-1"></i>Update Account</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm ms-2 d-none" id="cancel-update"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                                    </div>
+                                </form>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Initial Balance</th>
+                                                <th>Max Drawdown</th>
+                                                <th>Daily Drawdown</th>
+                                                <th>Max Trades/Day</th>
+                                                <th>Max Loss/Day</th>
+                                                <th>Profit Split</th>
+                                                <th>Prop Firm</th>
+                                                <th>Broker</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="account-list-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+             
+                    <!-- Pair Management -->
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header" id="pair-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#pair-management" aria-expanded="false" aria-controls="pair-management">
+                                <i class="bi bi-currency-exchange me-2"></i>Pair Management
+                            </button>
+                        </h2>
+                        <div id="pair-management" class="accordion-collapse collapse" aria-labelledby="pair-heading" data-bs-parent="#settingsAccordion">
+                            <div class="accordion-body">
+                                <form id="pair-form" class="mb-4">
+                                    <div class="mb-3">
+                                        <label for="pair-name" class="form-label">Pair Name</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="bi bi-currency-bitcoin"></i></span>
+                                            <input type="text" class="form-control" id="pair-name" placeholder="e.g., EURUSD" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+    <label for="market-type" class="form-label">Market Type</label>
+    <select class="form-select" id="market-type" required>
+        <option value="">Select Market Type</option>
+        <option value="forex">Forex</option>
+        <option value="indices">Indices</option>
+        <option value="commodities">Commodities</option>
+        <option value="crypto">Crypto</option>
+    </select>
+</div>
+
+
+                                    <div>
+                                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-plus-circle me-1"></i>Add Pair</button>
+                                        <button type="submit" class="btn btn-secondary btn-sm ms-2 d-none" id="update-pair"><i class="bi bi-pencil me-1"></i>Update Pair</button>
+                                        <button type="button" class="btn btn-outline-secondary btn-sm ms-2 d-none" id="cancel-pair-update"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+                                    </div>
+                                </form>
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-striped">
+                                       <thead class="table-light">
+                                            <tr>
+                                                <th>Name</th>
+                                                <th>Market Type</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody id="pair-list-body"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Trading Window -->
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header" id="trading-window-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#trading-window" aria-expanded="false" aria-controls="trading-window">
+                                <i class="bi bi-clock me-2"></i>Trading Window
+                            </button>
+                        </h2>
+                        <div id="trading-window" class="accordion-collapse collapse" aria-labelledby="trading-window-heading" data-bs-parent="#settingsAccordion">
+                            <div class="accordion-body">
+                                <form id="trading-window-form">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="window-start" class="form-label">Start Time</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                                <input type="time" class="form-control" id="window-start">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="window-end" class="form-label">End Time</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                                <input type="time" class="form-control" id="window-end">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mt-3">
+                                        <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-save me-1"></i>Save Trading Window</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Data Management -->
+                    <div class="accordion-item border-0 mb-2">
+                        <h2 class="accordion-header" id="data-heading">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#data-management" aria-expanded="false" aria-controls="data-management">
+                                <i class="bi bi-database me-2"></i>Data Management
+                            </button>
+                        </h2>
+                        <div id="data-management" class="accordion-collapse collapse" aria-labelledby="data-heading" data-bs-parent="#settingsAccordion">
+                            <div class="accordion-body">
+                                <div class="mb-3">
+                                    <button class="btn btn-primary btn-sm me-2" id="backup-data"><i class="bi bi-download me-1"></i>Backup Data</button>
+                                    <input type="file" class="form-control d-inline-block me-2" id="import-data" accept=".json" style="width: auto;">
+                                    <select class="form-select d-inline-block me-2" id="restore-backup" style="width: auto;">
+                                        <option value="">Select Auto-Backup</option>
+                                    </select>
+                                    <button class="btn btn-danger btn-sm" id="clear-data"><i class="bi bi-trash me-1"></i>Clear All Data</button>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="backup-frequency" class="form-label">Auto-Backup Frequency</label>
+                                    <div class="input-group" style="width: auto;">
+                                        <span class="input-group-text"><i class="bi bi-arrow-repeat"></i></span>
+                                        <select class="form-select" id="backup-frequency">
+                                            <option value="every-save">Every Save</option>
+                                            <option value="daily" selected>Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="custom">Custom</option>
+                                        </select>
+                                    </div>
+                                    <!-- In the data-management accordion-body, add retention policy inputs -->
+<div class="mb-3">
+    <label class="form-label">Backup Retention Policy</label>
+    <div class="input-group" style="width: auto;">
+        <span class="input-group-text"><i class="bi bi-archive"></i></span>
+        <input type="number" class="form-control" id="max-backups" min="1" value="10" placeholder="Max Backups" style="width: 120px;">
+        <span class="input-group-text">backups, keep for</span>
+        <input type="number" class="form-control" id="max-age-days" min="1" value="30" placeholder="Max Age (days)" style="width: 120px;">
+        <span class="input-group-text">days</span>
+    </div>
+</div>
+                                    <div id="custom-backup-interval" class="mt-2 d-none">
+                                        <label for="custom-interval" class="form-label">Custom Interval (days)</label>
+                                        <input type="number" class="form-control" id="custom-interval" min="1" value="1" style="width: 100px;">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="auto-backup-download">
+                                        <label class="form-check-label" for="auto-backup-download">Download Auto-Backup Files</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="reports" class="rpt-container page">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="rpt-filter-row row mb-3">
+                            <div class="col-md-3 mb-2">
+                                <label for="rpt-report-account" class="form-label">Account</label>
+                                <select id="rpt-report-account" class="form-select"></select>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="rpt-report-date-range" class="form-label">Date Range</label>
+                                <input id="rpt-report-date-range" class="form-control">
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="rpt-report-pair" class="form-label">Pair</label>
+                                <select id="rpt-report-pair" class="form-select"></select>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <label for="rpt-report-strategy" class="form-label">Strategy</label>
+                                <select id="rpt-report-strategy" class="form-select"></select>
+                            </div>
+                        </div>
+                        <div class="rpt-filter-controls mb-3">
+                            <div class="row align-items-center">
+                                <div class="col-md-4 mb-2" >
+                                    <div class="form-check" style="display: none;">
+                                        <input class="form-check-input" type="checkbox" id="rpt-show-performance-charts" checked="false">
+                                        <label class="form-check-label" for="rpt-show-performance-charts">Show Performance Charts</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rpt-show-charts" checked="false">
+                                        <label class="form-check-label" for="rpt-show-charts">Show Statistics Charts</label>
+                                    </div>
+
+                                    <div class="form-check">
+    <input class="form-check-input" type="checkbox" id="rpt-show-outside-window-charts" checked="false">
+    <label class="form-check-label" for="rpt-show-outside-window-charts">Show Outside Window Charts</label>
+</div>
+                                </div>
+                                <div class="col-md-8 mb-2 text-md-end">
+                                    <button class="btn btn-primary" id="rpt-export-csv">Export CSV</button>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="nav nav-tabs rpt-nav-tabs" id="rpt-tabs">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="rpt-performance-tab" data-bs-toggle="tab" href="#rpt-performance">Performance</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="rpt-statistics-tab" data-bs-toggle="tab" href="#rpt-statistics">Statistics</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="rpt-trader-profile-tab" data-bs-toggle="tab" href="#rpt-trader-profile">Trader Profile</a>
+                            </li>
+                            <li class="nav-item">
+    <a class="nav-link" id="rpt-outside-window-tab" data-bs-toggle="tab" href="#rpt-outside-window">Outside Window Trades</a>
+</li>
+                        </ul>
+                        <div class="tab-content rpt-tab-content">
+                            <div class="tab-pane fade show active" id="rpt-performance">
+                                <div class="rpt-performance-metrics"></div>
+                                <div class="rpt-report-row row">
+                                    <div class="col-md-6 rpt-chart-container rpt-equity-chart"></div>
+                                    <div class="col-md-6 rpt-chart-container rpt-win-loss-chart"></div>
+                                </div>
+                                <div class="rpt-report-row row">
+                                    <div class="col-md-12 rpt-chart-container rpt-pair-pnl-chart"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="rpt-statistics">
+                                <div class="rpt-report-row">
+                                    <h5>Day of Week</h5>
+                                    <table class="table rpt-table rpt-day-week-table"></table>
+                                    <div class="rpt-chart-container rpt-day-week-chart"></div>
+                                </div>
+                                <div class="rpt-report-row">
+                                    <h5>Week of Month</h5>
+                                    <table class="table rpt-table rpt-week-month-table"></table>
+                                    <div class="rpt-chart-container rpt-week-month-chart"></div>
+                                </div>
+                                <div class="rpt-report-row">
+                                    <h5>Month of Year</h5>
+                                    <table class="table rpt-table rpt-month-year-table"></table>
+                                    <div class="rpt-chart-container rpt-month-year-chart"></div>
+                                </div>
+                                <div class="rpt-report-row">
+                                    <h5>Hour of Day</h5>
+                                    <table class="table rpt-table rpt-hour-day-table"></table>
+                                    <div class="rpt-chart-container rpt-hour-day-chart"></div>
+                                </div>
+                                <div class="rpt-report-row">
+                                    <h5>Trading Session</h5>
+                                    <table class="table rpt-table rpt-trading-session-table"></table>
+                                    <div class="rpt-chart-container rpt-trading-session-chart"></div>
+                                </div>
+                                <div class="rpt-report-row">
+                                    <h5>Day of Month</h5>
+                                    <table class="table rpt-table rpt-day-month-table"></table>
+                                    <div class="rpt-chart-container rpt-day-month-chart"></div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="rpt-trader-profile">
+                                <div class="rpt-trader-profile"></div>
+                            </div>
+
+                            <!-- In <div class="tab-content rpt-tab-content">, add new pane -->
+<div class="tab-pane fade" id="rpt-outside-window">
+    <div class="rpt-outside-window"></div>
+</div>
+
+                        </div>
+                        <div class="rpt-error" style="display: none;">
+                            <p>Error loading reports. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <!-- Modals -->
+    <div class="modal fade" id="addWidgetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Widget</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="addWidgetList"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="widgetSettingsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Widget Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="widgetSettingsForm"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger me-auto" id="widgetSettingsReset">Reset to Default</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="widgetSettingsSave">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="deleteWidgetModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteWidgetTitle">Delete Widget</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this widget?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="deleteWidgetConfirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- index.html -->
+<!-- Update the dailyPlanModal and fullScreenImageModal -->
+<div class="modal fade" id="dailyPlanModal" tabindex="-1" aria-labelledby="dailyPlanModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dailyPlanModalLabel">Daily Plan Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="daily-plan-content">
+                    <p><strong>Account:</strong> <span id="daily-plan-account"></span></p>
+                    <p><strong>Date:</strong> <span id="daily-plan-date"></span></p>
+                    <p><strong>Game Plan:</strong> <span id="daily-plan-game-plan"></span></p>
+                    <p><strong>Market Bias:</strong> <span id="daily-plan-market-bias"></span></p>
+                    <p><strong>Emotions Before Trading:</strong> <span id="daily-plan-emotions"></span></p>
+                    <p><strong>Confidence Level (1–10):</strong> <span id="daily-plan-confidence"></span></p>
+                </div>
+                <hr>
+                <h6>Trades Taken on This Day</h6>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Pair</th>
+                                <th scope="col">Strategy</th>
+                                <th scope="col">Risk ($)</th>
+                                <th scope="col">Outcome</th>
+                                <th scope="col">P&L ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="daily-plan-trades">
+                            <!-- Trades will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="trade-details-section" class="mt-3" style="display: none;">
+                    <h6 class="text-primary mb-3">Trade Details</h6>
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Basic Info -->
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="border-bottom pb-2 mb-3 text-primary"><i class="bi bi-info-circle me-2"></i>Basic Info</h6>
+                                    <p><i class="bi bi-clock me-2 text-muted"></i><strong>Trade Time:</strong> <span id="trade-detail-time"></span></p>
+                                    <p><i class="bi bi-currency-exchange me-2 text-muted"></i><strong>Pair:</strong> <span id="trade-detail-pair"></span></p>
+                                    <p><i class="bi bi-gear me-2 text-muted"></i><strong>Strategy:</strong> <span id="trade-detail-strategy"></span></p>
+                                    <p><i class="bi bi-tag me-2 text-muted"></i><strong>Trade Type:</strong> <span id="trade-detail-type"></span></p>
+                                    <p><i class="bi bi-hourglass-split me-2 text-muted"></i><strong>Timeframe:</strong> <span id="trade-detail-timeframe"></span></p>
+                                    <p><i class="bi bi-star me-2 text-muted"></i><strong>Setup Score:</strong> <span id="trade-detail-score"></span></p>
+                                    <p><i class="bi bi-flag me-2 text-muted"></i><strong>Outcome:</strong> <span id="trade-detail-outcome" class="badge"></span></p>
+                                    <p><i class="bi bi-currency-dollar me-2 text-muted"></i><strong>P&L ($):</strong> <span id="trade-detail-pnl" class="text-profit"></span></p>
+                                    <p><i class="bi bi-wallet me-2 text-muted"></i><strong>Balance ($):</strong> <span id="trade-detail-balance"></span></p>
+                                    <p><i class="bi bi-wallet me-2 text-muted"></i><strong>Direction:</strong> <span id="trade-detail-direction"></span></p>
+                                </div>
+                                <!-- Risk and Reward -->
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="border-bottom pb-2 mb-3 text-primary"><i class="bi bi-graph-up me-2"></i>Risk and Reward</h6>
+                                    <p><i class="bi bi-hand-holding-dollar me-2 text-muted"></i><strong>Planned Risk ($):</strong> <span id="trade-detail-planned-risk"></span></p>
+                                    <p><i class="bi bi-hand-holding-dollar me-2 text-muted"></i><strong>Actual Risk ($):</strong> <span id="trade-detail-actual-risk"></span></p>
+                                    <p><i class="bi bi-balance-scale me-2 text-muted"></i><strong>Planned RR:</strong> <span id="trade-detail-planned-rr"></span></p>
+                                    <p><i class="bi bi-balance-scale me-2 text-muted"></i><strong>Actual RR:</strong> <span id="trade-detail-actual-rr"></span></p>
+                                    <p><i class="bi bi-box me-2 text-muted"></i><strong>Lot Size:</strong> <span id="trade-detail-lot-size"></span></p>
+                                    <p><i class="bi bi-shield me-2 text-muted"></i><strong>Stop Loss:</strong> <span id="trade-detail-stop-loss"></span></p>
+                                    <p><i class="bi bi-box-arrow-in-right me-2 text-muted"></i><strong>Entry Price:</strong> <span id="trade-detail-entry-price"></span></p>
+                                    <p><i class="bi bi-exclamation-triangle me-2 text-muted"></i><strong>SL Price:</strong> <span id="trade-detail-sl-price"></span></p>
+                                    <p><i class="bi bi-box-arrow-right me-2 text-muted"></i><strong>Exit Price:</strong> <span id="trade-detail-exit-price"></span></p>
+                                    <p><i class="bi bi-stopwatch me-2 text-muted"></i><strong>Hold Time (min):</strong> <span id="trade-detail-hold-time"></span></p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Trading Context -->
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="border-bottom pb-2 mb-3 text-primary"><i class="bi bi-book me-2"></i>Trading Context</h6>
+                                    <p><i class="bi bi-box-arrow-right me-2 text-muted"></i><strong>Exit Reason:</strong> <span id="trade-detail-exit-reason"></span></p>
+                                    <p><i class="bi bi-globe me-2 text-muted"></i><strong>Session:</strong> <span id="trade-detail-session"></span></p>
+                                    <p><i class="bi bi-emoji-smile me-2 text-muted"></i><strong>Mood:</strong> <span id="trade-detail-mood"></span></p>
+                                    <p><i class="bi bi-star-half me-2 text-muted"></i><strong>Discipline Score:</strong> <span id="trade-detail-discipline-score"></span></p>
+                                    <p><i class="bi bi-window me-2 text-muted"></i><strong>Outside Window:</strong> <span id="trade-detail-outside-window" class="badge"></span></p>
+                                </div>
+                                <!-- Additional Info -->
+                                <div class="col-md-6 mb-4">
+                                    <h6 class="border-bottom pb-2 mb-3 text-primary"><i class="bi bi-plus-circle me-2"></i>Additional Info</h6>
+                                    <p><i class="bi bi-exclamation-circle me-2 text-muted"></i><strong>Mistakes:</strong> <span id="trade-detail-mistakes"></span></p>
+                                    <p><i class="bi bi-heart me-2 text-muted"></i><strong>Emotions:</strong> <span id="trade-detail-emotions"></span></p>
+                                    <p><i class="bi bi-tags me-2 text-muted"></i><strong>Custom Tags:</strong> <span id="trade-detail-custom-tags"></span></p>
+                                    <div class="mb-2">
+                                        <p class="mb-1"><i class="bi bi-sticky me-2 text-muted"></i><strong>Notes:</strong></p>
+                                        <div class="border p-2 rounded bg-light" style="max-height: 100px; overflow-y: auto;">
+                                            <span id="trade-detail-notes"></span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1"><i class="bi bi-image me-2 text-muted"></i><strong>Screenshots:</strong></p>
+                                        <div class="border p-2 rounded bg-light d-flex flex-wrap" style="max-height: 150px; overflow-y: auto;" id="trade-detail-screenshots">
+                                            <!-- Screenshots will be populated here as thumbnails -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update the fullScreenImageModal to be full-width -->
+<div class="modal fade" id="fullScreenImageModal" tabindex="-1" aria-labelledby="fullScreenImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="fullScreenImageModalLabel">Screenshot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+                <img id="full-screen-image" src="" alt="Screenshot" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Image Preview Modal -->
+    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-clean">
+                    <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <img id="image-preview" src="" alt="Screenshot" style="max-width: 100%; height: auto;">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-clean-primary btn-sm" id="toggle-fullscreen">Full Screen</button>
+                    <button type="button" class="btn btn-clean-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this trade?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="confirm-delete">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clear Data Confirmation Modal -->
+    <div class="modal fade" id="clearDataModal" tabindex="-1" aria-labelledby="clearDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearDataModalLabel">Confirm Clear Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to clear all data? This cannot be undone, but a backup will be created.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger btn-sm" id="confirm-clear-data">Clear Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="calendarSettingsModal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Calendar Settings</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Checkboxes will be populated dynamically -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- index.html -->
+
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clusterize.js@0.19.0/clusterize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/interactjs@1.10.11/dist/interact.min.js"></script>
+    <script>if (typeof interact === 'undefined') { document.write('<script src="/local/interact.min.js"><\/script>'); }</script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/36.0.1/classic/ckeditor.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data.min.js"></script>
+
+<!-- After both are loaded: -->
+<script>
+    // VERY IMPORTANT: Register zoom plugin manually
+    Chart.register(window['chartjs-plugin-zoom']);
+</script>
+    <script type="module" src="import.js"></script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
